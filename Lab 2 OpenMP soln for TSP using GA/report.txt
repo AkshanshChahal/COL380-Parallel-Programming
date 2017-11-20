@@ -1,0 +1,11 @@
+PARALLEL ALGORITHM
+	After taking input I first populate the population by randomly shuffling the cities in any order. Then I run it for a fixed number of iterations, where in each iteration I first find the fittest set of paths, then mate them together by randomly picking up 2 parents from that fittest set. There crossover or mating is done by any of the two strategies PMX or GX, majorly by GX since it is a better one. Now with a 0.1 probability the parents mutate. In the end of each iteration some part of population is overwritten by the children of the fittest set.
+
+DESIGN DECISIONS
+	Have made several functions to maintain modularity. There are functions for PMX, GX, finding fittest set, sorting the population according to their fitness values, for mutation , to populate initially. Have made the functions not returning any value, all of them take variables by reference or work on global variables. Also have taken care of the functions in such a way that there is no race in the loop I have parallelised.
+
+PARALLELISATION STRATEGY
+	The main loop of iterations can’t be parallelised, since the future generations depend on their parent generations. The next level after that is the loop for one iteration. I have parallelised this loop using “ #pragma omp parallel for “, now several shared variables were being used in this loop, so had to make sure either they were being just read. If by chance being written then depend on the loop variable, since that will make sure there is no race in bw the threads of the loop. Some work I had to shift out of this loop to make sure its safely parallelised.
+
+LOAD BALANCING STRATEGY
+	I have parallelised the for loop in which I knew the workload before hand, hence the threads are allocated equal load by OpenMP by default. The parallel work was easily distributable amongst the threads. mainly the population variable was being read as well written, so had to make sure reads are form different places than the writes, and the writes depend not he loop iteration variable hence the work can be balanced equally amongst the threads.
