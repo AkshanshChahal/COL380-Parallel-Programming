@@ -1,0 +1,30 @@
+(i) DATA STRUCTURE : 
+		- I have used 1-D array for the elements to be prefix summed. I have made changes to the same array in which I obtained the input initially. 
+		- I had planned to use tree as the Data  Structure but in time complexity comparison bw the two the term of log(p) in tree case is replaced  by p in array case for my algorithm.
+
+
+(ii) OPTIMAL NO. Of THREADS :
+			- My code runs optimally when the no. of threads is equal to the number of processors on the machine. 
+		- My machine has 4 cores, so my code ran optimally for 4 threads on my machine and for 32 threads on the cluster account provided to us.
+
+(iii) DESIGN :
+			- The array is divided equally amongst the threads (except the last one if size of array is not divisible by no. of threads).
+			- Each thread computes prefix sum for the data of its own sequentially. Where all the threads all running parallely. [O(n/p) time]
+			- After joining all the threads, I compute prefix sum of all the last elements of the data of each thread. [O(p) time]
+			- Now I again run those threads in parallel where they add the last element of their predecessor thread to all the elements of their own. [O(n/p) time]
+			- If the no. of threads is not a factor of size of array, then I take care of the division of the array to get correct ans.
+
+
+(iv) PARALLELIZATION STRATEGY :
+		- Strategy was to run parallel threads to calculate their own prefix sum sequentially. 
+   		- To get the info from their predecessor threads, I calculate the prefix sum of the last elements of each thread's data. 
+   		- I do the above task in the same array and in the main thread.
+   		- Now again the threads work parallely to update their elements for the final ans.
+   		- So the threads are spawned twice.
+
+(v) LOAD BALANCING STRATEGY : 
+		- Since I have distributed the array equally amongst all the threads, the load is perfectly balanced bw all the threads.
+		- For the case of non even no. of threads I have taken care to specially assign the left out load in the end to the last thread.
+		- So just in the above case the last thread has little extra load.
+
+I have taken some code for calculating Md5-sum from StackOverflow.
