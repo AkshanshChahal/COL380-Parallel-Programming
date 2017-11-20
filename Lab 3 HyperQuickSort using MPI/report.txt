@@ -1,0 +1,29 @@
+
+DESIGN DECISIONS
+	Kept different local pointers to arrays which will be used by each process to execute a smooth exchange or swap of the left and right parts of its data. And used malloc and free at the right places to ensure there is no stress on the buffers and the processes too.
+
+	The loading of data from the input file and preparation of the local arrays for each process is done first.
+	Post which the while loop starts, in each iteration various variables are updated for an easy distinction between the processes i.e. #groups, size of each group, whether a process belongs to upper half of its group or lower half.
+
+	The end of LOG(n) iterations is indicated when the group size is reduced to 1.
+	This book keeping also helps in easy pairing of the processes at the time of swapping. 
+
+
+
+PARALLELISATION STRATEGY
+	All the groups do their work in parallel w.r.t each other. MPI uses SPMD strategy, hence just have to indicate which processes belong to which group and are in the lower or upper half of their group, they all sort their data in parallel and then exchange the parts of their arrays parallelly w.r.t other pairs of processes.
+
+	Inside a pair the processes exchange the size of the array they are going to receive at the time of swapping. This exchanging and the swapping of the arrays is done using MPI_Sendrecv() to avoid deadlocks.
+
+	The sending of pivot from the first process and receive by others in the same group is implemented using separate MPI_Send and MPI_Recv calls. 
+
+
+
+LOAD BALANCING STRATEGY
+	Each process gets the same load in terms of data initially. As the algorithms progresses. Depending on the type of the data the size of the data with each process can increase and decrease as well, so while sorting the elements locally different processes will have different loads. 
+
+	If the data size is very large as compared to number of processes then there is not so much differenc bw the load experienced by processes. But if the #processes is comparable to the size of data set, then in some extreme cases I also observed that size of data for a process effectively reduces to zero.
+
+	After all the sorting is done. I sequentially print out the elements starting from rank 0 proc to rank P-1 proc.
+	So here the load of printing also depends on the no. of elements each proc has with itself.
+
